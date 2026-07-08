@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RentEase — Premium Furniture & Appliance Rentals</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Auth Modal -->
+  <div class="modal-overlay" id="authModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="authModalTitle">Welcome Back</h3>
+        <button class="modal-close" onclick="closeAuthModal()">&times;</button>
+      </div>
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="switchAuthTab('login')">Sign In</button>
+        <button class="auth-tab" onclick="switchAuthTab('register')">Sign Up</button>
+      </div>
+
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label for="loginEmail">Email Address</label>
+          <input type="email" id="loginEmail" placeholder="your@email.com" required>
+        </div>
+        <div class="form-group">
+          <label for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" placeholder="Enter your password" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block btn-lg" id="loginBtn">Sign In</button>
+        
+      </form>
+
+      <form id="registerForm" class="hidden" onsubmit="handleRegister(event)">
+        <div class="form-group">
+          <label for="regName">Full Name</label>
+          <input type="text" id="regName" placeholder="John Doe" required>
+        </div>
+        <div class="form-group">
+          <label for="regEmail">Email Address</label>
+          <input type="email" id="regEmail" placeholder="your@email.com" required>
+        </div>
+        <div class="form-group">
+          <label for="regPhone">Phone Number</label>
+          <input type="tel" id="regPhone" placeholder="+91 9876543210">
+        </div>
+        <div class="form-group">
+          <label for="regPassword">Password</label>
+          <input type="password" id="regPassword" placeholder="Min 6 characters" required minlength="6">
+        </div>
+        <button type="submit" class="btn btn-primary btn-block btn-lg" id="registerBtn">Create Account</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">
+        <div class="logo-icon"><i class="fas fa-couch"></i></div>
+        RentEase
+      </a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html" class="active">Home</a></li>
+        <li><a href="catalog.html">Catalog</a></li>
+        <li><a href="catalog.html?category=Living+Room">Living Room</a></li>
+        <li><a href="catalog.html?category=Appliances">Appliances</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="cart.html" class="nav-cart" title="Cart">
+          <i class="fas fa-shopping-bag"></i>
+          <span class="badge" id="cartBadge">0</span>
+        </a>
+        <button class="btn btn-sm btn-outline" id="authBtn" onclick="openAuthModal()">Sign In</button>
+        <div class="hidden" id="userMenu" style="display:none;align-items:center;gap:8px;">
+          <button class="btn btn-sm btn-secondary" id="userMenuBtn">
+            <i class="fas fa-user-circle"></i> <span id="userName">User</span>
+          </button>
+          <button class="btn btn-sm btn-ghost" onclick="logout()" title="Logout">
+            <i class="fas fa-sign-out-alt"></i>
+          </button>
+        </div>
+        <button class="mobile-toggle" id="mobileToggle" onclick="toggleMobileMenu()">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <i class="fas fa-bolt"></i>
+        India's #1 Rental Platform
+      </div>
+      <h1>Live Better.<br><span>Rent Smarter.</span></h1>
+      <p>Furnish your dream home without the commitment. Premium furniture and appliances delivered to your doorstep with flexible rental plans starting at just ₹500/month.</p>
+      <div class="hero-actions">
+        <a href="catalog.html" class="btn btn-primary btn-lg">
+          <i class="fas fa-th-large"></i> Browse Catalog
+        </a>
+        <a href="#how-it-works" class="btn btn-outline btn-lg" style="color:white;border-color:rgba(255,255,255,0.3);">
+          <i class="fas fa-play-circle"></i> How It Works
+        </a>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="number">50K+</div>
+          <div class="label">Happy Customers</div>
+        </div>
+        <div class="hero-stat">
+          <div class="number">10K+</div>
+          <div class="label">Products Available</div>
+        </div>
+        <div class="hero-stat">
+          <div class="number">100+</div>
+          <div class="label">Cities Covered</div>
+        </div>
+        <div class="hero-stat">
+          <div class="number">4.8★</div>
+          <div class="label">Customer Rating</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="overline">Why Choose Us</span>
+        <h2>Renting Made Ridiculously Easy</h2>
+        <p>We handle everything from delivery to maintenance, so you can focus on enjoying your space.</p>
+      </div>
+      <div class="grid grid-4" id="featuresGrid">
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-truck"></i></div>
+          <h3>Free Delivery</h3>
+          <p>Free doorstep delivery and professional installation within 48 hours of booking.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-tools"></i></div>
+          <h3>Free Maintenance</h3>
+          <p>All products come with complimentary maintenance and repair throughout your rental period.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-exchange-alt"></i></div>
+          <h3>Easy Swaps</h3>
+          <p>Not loving it? Swap your product anytime for another from our catalog hassle-free.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-wallet"></i></div>
+          <h3>Flexible Plans</h3>
+          <p>Choose from 3, 6, or 12-month plans with significant discounts on longer tenures.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Popular Categories -->
+  <section class="categories-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="overline">Our Collection</span>
+        <h2>Browse by Category</h2>
+        <p>Explore our curated collection of premium furniture and appliances.</p>
+      </div>
+      <div class="flex flex-wrap justify-center gap-2" id="categoryChips">
+        <a href="catalog.html" class="category-chip active"><span class="chip-icon">🏠</span> All Products</a>
+        <a href="catalog.html?category=Living+Room" class="category-chip"><span class="chip-icon">🛋️</span> Living Room</a>
+        <a href="catalog.html?category=Bedroom" class="category-chip"><span class="chip-icon">🛏️</span> Bedroom</a>
+        <a href="catalog.html?category=Kitchen" class="category-chip"><span class="chip-icon">🍽️</span> Kitchen</a>
+        <a href="catalog.html?category=Office" class="category-chip"><span class="chip-icon">💼</span> Office</a>
+        <a href="catalog.html?category=Electronics" class="category-chip"><span class="chip-icon">📺</span> Electronics</a>
+        <a href="catalog.html?category=Appliances" class="category-chip"><span class="chip-icon">🧊</span> Appliances</a>
+        <a href="catalog.html?category=Outdoor" class="category-chip"><span class="chip-icon">🌿</span> Outdoor</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Products -->
+  <section class="products-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="overline">Trending Now</span>
+        <h2>Most Popular Rentals</h2>
+        <p>Discover what our customers are loving right now.</p>
+      </div>
+      <div class="grid grid-4" id="featuredProducts">
+        <div class="product-card"><div class="card-image skeleton" style="height:220px;"></div><div class="card-body"><div class="skeleton" style="height:14px;width:50%;margin-bottom:8px;"></div><div class="skeleton" style="height:20px;width:90%;margin-bottom:12px;"></div><div class="skeleton" style="height:24px;width:50%;margin-bottom:16px;"></div><div class="skeleton" style="height:38px;width:100%;"></div></div></div>
+        <div class="product-card"><div class="card-image skeleton" style="height:220px;"></div><div class="card-body"><div class="skeleton" style="height:14px;width:50%;margin-bottom:8px;"></div><div class="skeleton" style="height:20px;width:90%;margin-bottom:12px;"></div><div class="skeleton" style="height:24px;width:50%;margin-bottom:16px;"></div><div class="skeleton" style="height:38px;width:100%;"></div></div></div>
+        <div class="product-card"><div class="card-image skeleton" style="height:220px;"></div><div class="card-body"><div class="skeleton" style="height:14px;width:50%;margin-bottom:8px;"></div><div class="skeleton" style="height:20px;width:90%;margin-bottom:12px;"></div><div class="skeleton" style="height:24px;width:50%;margin-bottom:16px;"></div><div class="skeleton" style="height:38px;width:100%;"></div></div></div>
+        <div class="product-card"><div class="card-image skeleton" style="height:220px;"></div><div class="card-body"><div class="skeleton" style="height:14px;width:50%;margin-bottom:8px;"></div><div class="skeleton" style="height:20px;width:90%;margin-bottom:12px;"></div><div class="skeleton" style="height:24px;width:50%;margin-bottom:16px;"></div><div class="skeleton" style="height:38px;width:100%;"></div></div></div>
+      </div>
+      <div class="text-center mt-4">
+        <a href="catalog.html" class="btn btn-outline btn-lg">
+          <i class="fas fa-th-large"></i> View All Products
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section class="how-it-works" id="how-it-works">
+    <div class="container">
+      <div class="section-header">
+        <span class="overline">Simple Process</span>
+        <h2>How RentEase Works</h2>
+        <p>Get started in just 4 simple steps</p>
+      </div>
+      <div class="grid grid-4">
+        <div class="step-card">
+          <div class="step-number">1</div>
+          <h3>Browse & Choose</h3>
+          <p>Explore our catalog and pick the perfect furniture or appliance for your space.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">2</div>
+          <h3>Select Tenure</h3>
+          <p>Pick a rental plan that suits you — 3, 6, or 12 months with amazing discounts.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">3</div>
+          <h3>Schedule Delivery</h3>
+          <p>Choose your preferred delivery date and time slot. We handle the rest.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">4</div>
+          <h3>Enjoy & Relax</h3>
+          <p>Free maintenance, easy returns, and 24/7 support throughout your rental period.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="testimonials-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="overline">Customer Love</span>
+        <h2>What Our Customers Say</h2>
+      </div>
+      <div class="grid grid-3">
+        <div class="testimonial-card">
+          <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
+          <p class="text">"RentEase transformed my apartment into a home. The sofa is incredibly comfortable and the delivery was super fast. Love the flexibility!"</p>
+          <div class="author">
+            <div class="author-avatar">P</div>
+            <div class="author-info">
+              <div class="name">Priya Sharma</div>
+              <div class="role">Software Engineer, Bangalore</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
+          <p class="text">"I rented a washing machine for 6 months and saved so much compared to buying. The maintenance service is a game changer!"</p>
+          <div class="author">
+            <div class="author-avatar">R</div>
+            <div class="author-info">
+              <div class="name">Rahul Verma</div>
+              <div class="role">Marketing Manager, Delhi</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
+          <p class="text">"Perfect for people who move cities often. Rented a complete bedroom set and it was in pristine condition. Highly recommend!"</p>
+          <div class="author">
+            <div class="author-avatar">A</div>
+            <div class="author-info">
+              <div class="name">Ananya Patel</div>
+              <div class="role">Product Designer, Mumbai</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section">
+    <div class="container">
+      <h2>Ready to Transform Your Space?</h2>
+      <p>Join 50,000+ happy customers who chose RentEase for smarter living.</p>
+      <a href="catalog.html" class="btn btn-lg">
+        <i class="fas fa-arrow-right"></i> Start Renting Today
+      </a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <h3>🏠 RentEase</h3>
+          <p>India's most trusted furniture and appliance rental platform. Live the life you want, without the commitment of buying.</p>
+          <div class="flex gap-2">
+            <a href="#" class="nav-cart" style="width:36px;height:36px;font-size:0.9rem;"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="nav-cart" style="width:36px;height:36px;font-size:0.9rem;"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="nav-cart" style="width:36px;height:36px;font-size:0.9rem;"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="nav-cart" style="width:36px;height:36px;font-size:0.9rem;"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="catalog.html">Browse Catalog</a></li>
+            <li><a href="#how-it-works">How It Works</a></li>
+            <li><a href="#">Pricing Plans</a></li>
+            <li><a href="#">FAQs</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Categories</h4>
+          <ul>
+            <li><a href="catalog.html?category=Living+Room">Living Room</a></li>
+            <li><a href="catalog.html?category=Bedroom">Bedroom</a></li>
+            <li><a href="catalog.html?category=Appliances">Appliances</a></li>
+            <li><a href="catalog.html?category=Electronics">Electronics</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Support</h4>
+          <ul>
+            <li><a href="#">Help Center</a></li>
+            <li><a href="#">Contact Us</a></li>
+            <li><a href="#">Terms of Service</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 RentEase. All rights reserved. Made with <span style="color:var(--accent);">♥</span> for smarter living.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const data = await API.getProducts({ sort: 'rating' });
+        const products = (data.products || []).slice(0, 4);
+        renderFeaturedProducts(products);
+      } catch (err) {
+        console.error('Error loading featured products:', err);
+      }
+    });
+
+    function renderFeaturedProducts(products) {
+      const grid = document.getElementById('featuredProducts');
+      if (!grid || !products.length) return;
+
+      grid.innerHTML = products.map(p => {
+        const lowestRent = Math.min(...p.tenureOptions.map(t => t.monthlyRent));
+        const bestDiscount = Math.max(...p.tenureOptions.map(t => t.discount));
+        return `
+          <div class="product-card">
+            <div class="card-image">
+              <img src="${p.image}" alt="${p.name}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800'">
+              ${bestDiscount > 20 ? `<span class="card-badge badge-discount">${bestDiscount}% OFF</span>` : ''}
+            </div>
+            <div class="card-body">
+              <div class="card-category">${p.category}</div>
+              <h3 class="card-title">${p.name}</h3>
+              <div class="card-rating">
+                <span class="stars">${getStarRating(p.rating)}</span>
+                <span class="count">(${p.numReviews})</span>
+              </div>
+              <div class="card-price">
+                <span class="amount">₹${lowestRent.toLocaleString()}</span>
+                <span class="period">/month</span>
+              </div>
+              <div class="card-footer">
+                <a href="product.html?id=${p._id}" class="btn btn-primary btn-sm">View Details</a>
+                <button class="btn btn-outline btn-sm" onclick="quickAddToCart('${p._id}', '${p.name.replace(/'/g, "\\'")}', '${p.image}', ${lowestRent}, ${p.deposit})" title="Quick Add">
+                  <i class="fas fa-cart-plus"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout — RentEase</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Auth Modal -->
+  <div class="modal-overlay" id="authModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="authModalTitle">Welcome Back</h3>
+        <button class="modal-close" onclick="closeAuthModal()">&times;</button>
+      </div>
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="switchAuthTab('login')">Sign In</button>
+        <button class="auth-tab" onclick="switchAuthTab('register')">Sign Up</button>
+      </div>
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label for="loginEmail">Email Address</label>
+          <input type="email" id="loginEmail" placeholder="your@email.com" required>
+        </div>
+        <div class="form-group">
+          <label for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" placeholder="Enter your password" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block btn-lg" id="loginBtn">Sign In</button>
+      </form>
+      <form id="registerForm" class="hidden" onsubmit="handleRegister(event)">
+        <div class="form-group">
+          <label for="regName">Full Name</label>
+          <input type="text" id="regName" placeholder="John Doe" required>
+        </div>
+        <div class="form-group">
+          <label for="regEmail">Email Address</label>
+          <input type="email" id="regEmail" placeholder="your@email.com" required>
+        </div>
+        <div class="form-group">
+          <label for="regPhone">Phone Number</label>
+          <input type="tel" id="regPhone" placeholder="+91 9876543210">
+        </div>
+        <div class="form-group">
+          <label for="regPassword">Password</label>
+          <input type="password" id="regPassword" placeholder="Min 6 characters" required minlength="6">
+        </div>
+        <button type="submit" class="btn btn-primary btn-block btn-lg" id="registerBtn">Create Account</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Order Success Modal -->
+  <div class="modal-overlay" id="orderSuccessModal">
+    <div class="modal" style="text-align:center;">
+      <div style="font-size:4rem;margin-bottom:20px;">🎉</div>
+      <h3 style="font-size:1.5rem;margin-bottom:12px;">Order Placed Successfully!</h3>
+      <p class="text-muted mb-3">Your rental order has been confirmed. We'll deliver your items on the scheduled date.</p>
+        <p style="background:rgba(16,185,129,0.08);padding:10px;border-radius:8px;font-size:0.85rem;color:var(--text-secondary);margin-bottom:16px;">
+          <i class="fas fa-money-bill-wave" style="color:var(--success);"></i> Please keep the payment (rent + deposit) ready at the time of delivery.
+        </p>
+      <div id="orderIdDisplay" style="background:var(--bg-main);padding:16px;border-radius:var(--radius-md);margin-bottom:24px;font-size:0.9rem;">
+        <span class="text-muted">Order ID:</span> <strong id="successOrderId"></strong>
+      </div>
+      <div class="flex gap-2" style="justify-content:center;flex-wrap:wrap;">
+        <a href="catalog.html" class="btn btn-outline">Continue Shopping</a>
+        <button class="btn btn-primary" onclick="document.getElementById('orderSuccessModal').classList.remove('active')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <nav class="navbar" id="navbar">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">
+        <div class="logo-icon"><i class="fas fa-couch"></i></div>
+        RentEase
+      </a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="catalog.html">Catalog</a></li>
+        <li><a href="catalog.html?category=Living+Room">Living Room</a></li>
+        <li><a href="catalog.html?category=Appliances">Appliances</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="cart.html" class="nav-cart" title="Cart">
+          <i class="fas fa-shopping-bag"></i>
+          <span class="badge" id="cartBadge">0</span>
+        </a>
+        <button class="btn btn-sm btn-outline" id="authBtn" onclick="openAuthModal()">Sign In</button>
+        <div class="hidden" id="userMenu" style="display:none;align-items:center;gap:8px;">
+          <button class="btn btn-sm btn-secondary" id="userMenuBtn">
+            <i class="fas fa-user-circle"></i> <span id="userName">User</span>
+          </button>
+          <button class="btn btn-sm btn-ghost" onclick="logout()" title="Logout">
+            <i class="fas fa-sign-out-alt"></i>
+          </button>
+        </div>
+        <button class="mobile-toggle" id="mobileToggle" onclick="toggleMobileMenu()">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <section class="checkout-section">
+    <div class="container">
+      <h2 style="margin-bottom:32px;"><i class="fas fa-shopping-cart text-accent"></i> Your Cart & Checkout</h2>
+
+      <div class="hidden" id="emptyCart" style="text-align:center;padding:80px 20px;">
+        <div style="font-size:5rem;margin-bottom:24px;opacity:0.3;">🛒</div>
+        <h3>Your cart is empty</h3>
+        <p class="text-muted mt-1">Looks like you haven't added anything yet. Browse our catalog to find amazing rentals.</p>
+        <a href="catalog.html" class="btn btn-primary btn-lg mt-3"><i class="fas fa-th-large"></i> Browse Catalog</a>
+      </div>
+
+      <div class="checkout-grid" id="cartContent">
+        <div class="checkout-form">
+          <form id="checkoutForm" onsubmit="handleCheckout(event)">
+
+            <div class="form-section-title">
+              <span class="icon"><i class="fas fa-box-open"></i></span>
+              Rental Items (<span id="itemCount">0</span>)
+            </div>
+            <div id="cartItemsList" class="mb-3"></div>
+
+            <div class="form-section-title">
+              <span class="icon"><i class="fas fa-map-marker-alt"></i></span>
+              Delivery Address
+            </div>
+            <div class="form-group">
+              <label for="street">Street Address *</label>
+              <input type="text" id="street" placeholder="123 Main Street, Apt 4B" required>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="city">City *</label>
+                <input type="text" id="city" placeholder="Mumbai" required>
+              </div>
+              <div class="form-group">
+                <label for="state">State *</label>
+                <input type="text" id="state" placeholder="Maharashtra" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="zipCode">ZIP Code *</label>
+                <input type="text" id="zipCode" placeholder="400001" required>
+              </div>
+              <div class="form-group">
+                <label for="phone">Phone Number *</label>
+                <input type="tel" id="phone" placeholder="+91 9876543210" required>
+              </div>
+            </div>
+
+            <div class="form-section-title">
+              <span class="icon"><i class="fas fa-truck"></i></span>
+              Delivery Schedule
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="deliveryDate">Preferred Delivery Date *</label>
+                <input type="date" id="deliveryDate" required>
+              </div>
+              <div class="form-group">
+                <label for="timeSlot">Time Slot *</label>
+                <select id="timeSlot" required>
+                  <option value="">Select time slot</option>
+                  <option value="9:00 AM - 12:00 PM">9:00 AM - 12:00 PM</option>
+                  <option value="12:00 PM - 3:00 PM">12:00 PM - 3:00 PM</option>
+                  <option value="3:00 PM - 6:00 PM">3:00 PM - 6:00 PM</option>
+                  <option value="6:00 PM - 9:00 PM">6:00 PM - 9:00 PM</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="notes">Special Instructions (Optional)</label>
+              <textarea id="notes" rows="3" placeholder="Any special delivery instructions..."></textarea>
+            </div>
+              
+            <!-- ==================== PAYMENT METHOD ==================== -->
+
+            <div class="form-section-title">
+              <span class="icon"><i class="fas fa-credit-card"></i></span>
+              Payment Method
+            </div>
+            <div class="form-group">
+              <div style="display:flex;flex-direction:column;gap:12px;">
+
+                <label style="display:flex;align-items:center;gap:12px;padding:14px;border:2px solid var(--primary);border-radius:var(--radius-sm);cursor:pointer;background:rgba(233,30,99,0.03);">
+                  <input type="radio" name="paymentMethod" value="Cash on Delivery" checked style="width:18px;height:18px;">
+                  <div>
+                    <div style="font-weight:600;"><i class="fas fa-money-bill-wave" style="color:var(--success);"></i> Cash on Delivery</div>
+                    <div style="font-size:0.8rem;color:var(--text-secondary);">Pay the first month's rent & deposit at the time of delivery.</div>
+                  </div>
+                </label>
+
+                <label style="display:flex;align-items:center;gap:12px;padding:14px;border:2px solid var(--border-light);border-radius:var(--radius-sm);cursor:pointer;">
+                  <input type="radio" name="paymentMethod" value="UPI on Delivery" style="width:18px;height:18px;">
+                  <div>
+                    <div style="font-weight:600;"><i class="fas fa-mobile-alt" style="color:var(--primary);"></i> UPI on Delivery</div>
+                    <div style="font-size:0.8rem;color:var(--text-secondary);">Pay via UPI (GPay / PhonePe / Paytm) when your items arrive.</div>
+                  </div>
+                </label>
+
+              </div>
+              <p style="font-size:0.8rem;color:var(--text-secondary);margin-top:10px;">
+                <i class="fas fa-info-circle text-accent"></i> Monthly rent thereafter will be collected on the same date each month. No payment is charged now.
+              </p>
+            </div>
+
+            <!-- ==================== END PAYMENT METHOD ==================== -->
+
+            <button type="submit" class="btn btn-primary btn-lg btn-block mt-2" id="checkoutBtn">
+              <i class="fas fa-lock"></i> Place Rental Order
+            </button>
+            <p class="text-center mt-2 text-muted" style="font-size:0.8rem;">
+              <i class="fas fa-shield-alt"></i> Your payment info is secure. Refundable deposit applies.
+            </p>
+          </form>
+        </div>
+
+        <div class="order-summary-card">
+          <h3 style="font-size:1.2rem;margin-bottom:24px;">
+            <i class="fas fa-receipt text-accent"></i> Order Summary
+          </h3>
+          <div id="orderSummaryItems"></div>
+          <div id="orderSummaryTotals"></div>
+          <div class="mt-3" style="background:var(--bg-main);padding:16px;border-radius:var(--radius-sm);">
+            <h4 style="font-size:0.85rem;margin-bottom:10px;"><i class="fas fa-info-circle text-accent"></i> What's Included</h4>
+            <ul style="list-style:none;font-size:0.8rem;color:var(--text-secondary);">
+              <li style="margin-bottom:6px;"><span style="color:var(--success);">✓</span> Free delivery & professional installation</li>
+              <li style="margin-bottom:6px;"><span style="color:var(--success);">✓</span> Free maintenance throughout tenure</li>
+              <li style="margin-bottom:6px;"><span style="color:var(--success);">✓</span> Easy product swap option</li>
+              <li><span style="color:var(--success);">✓</span> 100% refundable security deposit</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <p>&copy; 2026 RentEase. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      renderCartPage();
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      document.getElementById('deliveryDate').min = tomorrow.toISOString().split('T')[0];
+
+      const user = getStoredUser();
+      if (user) {
+        if (user.phone) document.getElementById('phone').value = user.phone;
+        if (user.address) {
+          if (user.address.street) document.getElementById('street').value = user.address.street;
+          if (user.address.city) document.getElementById('city').value = user.address.city;
+          if (user.address.state) document.getElementById('state').value = user.address.state;
+          if (user.address.zipCode) document.getElementById('zipCode').value = user.address.zipCode;
+        }
+      }
+    });
+
+    function renderCartPage() {
+      const cart = getCart();
+      const emptyCart = document.getElementById('emptyCart');
+      const cartContent = document.getElementById('cartContent');
+
+      if (cart.length === 0) {
+        emptyCart.classList.remove('hidden');
+        cartContent.classList.add('hidden');
+        return;
+      }
+
+      emptyCart.classList.add('hidden');
+      cartContent.classList.remove('hidden');
+      renderCartItems(cart);
+      renderOrderSummary(cart);
+    }
+
+    function renderCartItems(cart) {
+      const container = document.getElementById('cartItemsList');
+      document.getElementById('itemCount').textContent = cart.length;
+      container.innerHTML = cart.map((item, idx) => `
+        <div class="order-item" style="position:relative;">
+          <div class="item-image">
+            <img src="${item.image}" alt="${item.name}" onerror="this.src='https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=200'">
+          </div>
+          <div class="item-details" style="flex:1;">
+            <h4>${item.name}</h4>
+            <div class="item-meta">${item.category || 'Product'} • ${item.tenure} month${item.tenure > 1 ? 's' : ''} rental</div>
+            <div style="font-weight:700;color:var(--primary);margin-top:4px;">
+              ₹${item.monthlyRent.toLocaleString()}/mo × ${item.tenure} = ₹${(item.monthlyRent * item.tenure).toLocaleString()}
+            </div>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="removeCartItem(${idx})" style="position:absolute;top:0;right:0;color:var(--danger);" title="Remove">
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      `).join('');
+    }
+
+        function renderOrderSummary(cart) {
+      const container = document.getElementById('orderSummaryItems');
+      const totals = document.getElementById('orderSummaryTotals');
+
+      container.innerHTML = cart.map(item => `
+        <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:0.9rem;">
+          <span style="color:var(--text-secondary);">${item.name} (${item.tenure}mo)</span>
+          <span>₹${(item.monthlyRent * item.tenure).toLocaleString()}</span>
+        </div>
+      `).join('');
+
+      const totalRent = cart.reduce((sum, i) => sum + (i.monthlyRent * i.tenure), 0);
+      const totalDeposit = cart.reduce((sum, i) => sum + i.deposit, 0);
+
+      totals.innerHTML = `
+        <div style="border-top:1px solid var(--border-light);margin-top:12px;padding-top:12px;">
+          <div class="summary-line"><span>Subtotal (Rent)</span><span>₹${totalRent.toLocaleString()}</span></div>
+          <div class="summary-line"><span>Refundable Deposit</span><span>₹${totalDeposit.toLocaleString()}</span></div>
+          <div class="summary-line"><span>Delivery & Installation</span><span style="color:var(--success);">FREE</span></div>
+          <div class="summary-line total"><span>Total Payable</span><span>₹${(totalRent + totalDeposit).toLocaleString()}</span></div>
+          <div style="background:rgba(16,185,129,0.08);padding:10px;border-radius:var(--radius-sm);margin-top:10px;text-align:center;font-size:0.8rem;color:var(--text-secondary);">
+            <i class="fas fa-hand-holding-usd" style="color:var(--success);"></i> Payable at the time of <strong>delivery</strong> — nothing charged now.
+          </div>
+        </div>
+      `;
+    }
+    function removeCartItem(index) {
+      const cart = getCart();
+      cart.splice(index, 1);
+      saveCart(cart);
+      updateCartBadge();
+      renderCartPage();
+      showToast('Item removed from cart', 'info');
+    }
+
+    async function handleCheckout(e) {
+      e.preventDefault();
+      const user = getStoredUser();
+      if (!user || !user.token) {
+        showToast('Please sign in to place an order', 'error');
+        openAuthModal();
+        return;
+      }
+      const cart = getCart();
+      if (cart.length === 0) {
+        showToast('Your cart is empty', 'error');
+        return;
+      }
+      const btn = document.getElementById('checkoutBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="loader"></span> Processing...';
+
+      const deliveryAddress = {
+        street: document.getElementById('street').value,
+        city: document.getElementById('city').value,
+        state: document.getElementById('state').value,
+        zipCode: document.getElementById('zipCode').value,
+      };
+      const deliverySlot = {
+        date: document.getElementById('deliveryDate').value,
+        timeSlot: document.getElementById('timeSlot').value,
+      };
+            const notes = document.getElementById('notes').value;
+
+      // Get selected payment method
+      const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value || 'Cash on Delivery';
+
+      let ordersPlaced = 0;
+      let lastOrderId = '';
+
+      try {
+        for (const item of cart) {
+          const order = await API.createOrder({
+            productId: item.productId,
+            tenureMonths: item.tenure,
+            deliveryAddress,
+            deliverySlot,
+            notes,
+            paymentMethod,
+          }, user.token);
+          lastOrderId = order._id;
+          ordersPlaced++;
+        }
+
+        saveCart([]);
+        updateCartBadge();
+        document.getElementById('successOrderId').textContent = String(lastOrderId).slice(-8).toUpperCase();
+        document.getElementById('orderSuccessModal').classList.add('active');
+        showToast(`${ordersPlaced} order(s) placed successfully!`, 'success');
+      } catch (err) {
+        console.error('Checkout error:', err);
+        showToast(err.message || 'Failed to place order. Please try again.', 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-lock"></i> Place Rental Order';
+      }
+    }
+  </script>
+</body>
+</html>

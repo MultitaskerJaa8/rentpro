@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product — RentEase</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Auth Modal -->
+  <div class="modal-overlay" id="authModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="authModalTitle">Welcome Back</h3>
+        <button class="modal-close" onclick="closeAuthModal()">&times;</button>
+      </div>
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="switchAuthTab('login')">Sign In</button>
+        <button class="auth-tab" onclick="switchAuthTab('register')">Sign Up</button>
+      </div>
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label for="loginEmail">Email Address</label>
+          <input type="email" id="loginEmail" placeholder="your@email.com" required>
+        </div>
+        <div class="form-group">
+          <label for="loginPassword">Password</label>
+          <input type="password" id="loginPassword" placeholder="Enter your password" required>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block btn-lg" id="loginBtn">Sign In</button>
+        
+      </form>
+      <form id="registerForm" class="hidden" onsubmit="handleRegister(event)">
+        <div class="form-group">
+          <label for="regName">Full Name</label>
+          <input type="text" id="regName" placeholder="John Doe" required>
+        </div>
+        <div class="form-group">
+          <label for="regEmail">Email Address</label>
+          <input type="email" id="regEmail" placeholder="your@email.com" required>
+        </div>
+        <div class="form-group">
+          <label for="regPhone">Phone Number</label>
+          <input type="tel" id="regPhone" placeholder="+91 9876543210">
+        </div>
+        <div class="form-group">
+          <label for="regPassword">Password</label>
+          <input type="password" id="regPassword" placeholder="Min 6 characters" required minlength="6">
+        </div>
+        <button type="submit" class="btn btn-primary btn-block btn-lg" id="registerBtn">Create Account</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">
+        <div class="logo-icon"><i class="fas fa-couch"></i></div>
+        RentEase
+      </a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="/">Home</a></li>
+        <li><a href="/catalog">Catalog</a></li>
+        <li><a href="/catalog?category=Living+Room">Living Room</a></li>
+        <li><a href="/catalog?category=Appliances">Appliances</a></li>
+      </ul>
+      <div class="nav-actions">
+        <a href="/cart" class="nav-cart" title="Cart">
+          <i class="fas fa-shopping-bag"></i>
+          <span class="badge" id="cartBadge">0</span>
+        </a>
+        <button class="btn btn-sm btn-outline" id="authBtn" onclick="openAuthModal()">Sign In</button>
+        <div class="hidden" id="userMenu">
+          <button class="btn btn-sm btn-secondary" id="userMenuBtn">
+            <i class="fas fa-user-circle"></i> <span id="userName">User</span>
+          </button>
+          <button class="btn btn-sm btn-ghost" onclick="logout()" title="Logout">
+            <i class="fas fa-sign-out-alt"></i>
+          </button>
+        </div>
+        <button class="mobile-toggle" id="mobileToggle" onclick="toggleMobileMenu()">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Product Detail -->
+  <section class="product-detail">
+    <div class="container">
+      <div class="flex gap-4 flex-col" id="productContent" style="flex-direction:column;">
+        <!-- Loading state -->
+        <div class="grid grid-2" style="gap:40px;">
+          <div class="product-gallery skeleton" style="min-height:400px;"></div>
+          <div class="product-info">
+            <div class="skeleton" style="height:16px;width:40%;margin-bottom:16px;"></div>
+            <div class="skeleton" style="height:32px;width:80%;margin-bottom:12px;"></div>
+            <div class="skeleton" style="height:20px;width:50%;margin-bottom:20px;"></div>
+            <div class="skeleton" style="height:80px;width:100%;margin-bottom:28px;"></div>
+            <div class="skeleton" style="height:200px;width:100%;margin-bottom:24px;"></div>
+            <div class="skeleton" style="height:100px;width:100%;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <h3>🏠 RentEase</h3>
+          <p>India's most trusted furniture and appliance rental platform.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="/catalog">Browse Catalog</a></li>
+            <li><a href="/">How It Works</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Support</h4>
+          <ul>
+            <li><a href="#">Help Center</a></li>
+            <li><a href="#">Contact Us</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 RentEase. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    let product = null;
+    let selectedTenure = null;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const params = new URLSearchParams(window.location.search);
+      const productId = params.get('id');
+      if (!productId) {
+        window.location.href = '/catalog';
+        return;
+      }
+      try {
+        product = await API.getProduct(productId);
+        selectedTenure = product.tenureOptions[product.tenureOptions.length - 1]; // Default to longest tenure
+        renderProduct(product);
+        document.title = `${product.name} — RentEase`;
+      } catch (err) {
+        console.error('Error loading product:', err);
+        document.getElementById('productContent').innerHTML = `
+          <div class="text-center" style="padding:80px 20px;">
+            <div style="font-size:4rem;margin-bottom:20px;">😕</div>
+            <h2>Product Not Found</h2>
+            <p class="mt-2 text-muted">The product you're looking for doesn't exist or has been removed.</p>
+            <a href="/catalog" class="btn btn-primary mt-3">Back to Catalog</a>
+          </div>
+        `;
+      }
+    });
+
+    function renderProduct(p) {
+      const container = document.getElementById('productContent');
+      const defaultTenureIdx = p.tenureOptions.length - 1;
+
+      container.innerHTML = `
+        <div class="grid grid-2" style="gap:40px;align-items:start;">
+          <!-- Gallery -->
+          <div class="product-gallery">
+            <img src="${p.image}" alt="${p.name}" id="mainImage">
+            ${p.availability ? '' : '<div style="position:absolute;top:16px;left:16px;background:var(--danger);color:white;padding:6px 16px;border-radius:var(--radius-full);font-size:0.8rem;font-weight:700;">Out of Stock</div>'}
+          </div>
+
+          <!-- Info -->
+          <div class="product-info">
+            <div class="breadcrumb">
+              <a href="/">Home</a> <span>/</span>
+              <a href="/catalog?category=${encodeURIComponent(p.category)}">${p.category}</a> <span>/</span>
+              <span style="color:var(--text-primary);">${p.name}</span>
+            </div>
+
+            <h1 class="product-title">${p.name}</h1>
+
+            <div class="product-meta">
+              <span class="rating-stars">${getStarRating(p.rating)}</span>
+              <span>${p.rating} (${p.numReviews} reviews)</span>
+              ${p.brand ? `<span>•</span><span>${p.brand}</span>` : ''}
+              <span>•</span>
+              <span style="color:${p.availability ? 'var(--success)' : 'var(--danger)'};">${p.availability ? '● Available' : '● Unavailable'}</span>
+            </div>
+
+            <p class="product-desc">${p.description}</p>
+
+            <!-- Features -->
+            ${p.features && p.features.length > 0 ? `
+              <ul class="features-list">
+                ${p.features.map(f => `<li><span class="check">✓</span> ${f}</li>`).join('')}
+              </ul>
+            ` : ''}
+
+            <!-- Tenure Selector -->
+            <div class="tenure-selector">
+              <h4><i class="fas fa-calendar-alt text-accent"></i> Choose Your Rental Plan</h4>
+              <div class="tenure-options">
+                ${p.tenureOptions.map((t, idx) => `
+                  <div class="tenure-option ${idx === defaultTenureIdx ? 'selected' : ''}" onclick="selectTenure(${idx})" id="tenure-${idx}">
+                    ${idx === defaultTenureIdx ? '<span class="best-value">Best Value</span>' : ''}
+                    <div class="duration">${t.months} Month${t.months > 1 ? 's' : ''}</div>
+                    <div class="price">₹${t.monthlyRent.toLocaleString()}</div>
+                    <div class="price-period">per month</div>
+                    ${t.discount > 0 ? `<div class="save-badge">Save ${t.discount}%</div>` : ''}
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+
+            <!-- Price Summary -->
+            <div class="price-summary" id="priceSummary">
+              <!-- Populated by JS -->
+            </div>
+
+            <!-- Add to Cart -->
+            <div class="flex gap-2">
+              <button class="btn btn-primary btn-lg" style="flex:2;" onclick="addProductToCart()" ${!p.availability ? 'disabled style="flex:2;opacity:0.5;cursor:not-allowed;"' : ''}>
+                <i class="fas fa-shopping-cart"></i> Add to Cart
+              </button>
+              <a href="/cart" class="btn btn-secondary btn-lg" style="flex:1;">
+                <i class="fas fa-bolt"></i> Rent Now
+              </a>
+            </div>
+
+            <p class="mt-2 text-muted" style="font-size:0.85rem;">
+              <i class="fas fa-shield-alt text-accent"></i> Refundable deposit: ₹${p.deposit.toLocaleString()} &nbsp;|&nbsp;
+              <i class="fas fa-truck text-accent"></i> Free delivery & installation
+            </p>
+          </div>
+        </div>
+      `;
+
+      updatePriceSummary();
+    }
+
+    function selectTenure(idx) {
+      selectedTenure = product.tenureOptions[idx];
+      document.querySelectorAll('.tenure-option').forEach(el => el.classList.remove('selected'));
+      document.getElementById(`tenure-${idx}`).classList.add('selected');
+      updatePriceSummary();
+    }
+
+    function updatePriceSummary() {
+      if (!selectedTenure || !product) return;
+      const summary = document.getElementById('priceSummary');
+      const totalRent = selectedTenure.monthlyRent * selectedTenure.months;
+      const originalTotal = product.tenureOptions[0].monthlyRent * selectedTenure.months;
+      const savings = originalTotal - totalRent;
+
+      summary.innerHTML = `
+        <div class="summary-row">
+          <span>Monthly Rent</span>
+          <span>₹${selectedTenure.monthlyRent.toLocaleString()}</span>
+        </div>
+        <div class="summary-row">
+          <span>Tenure</span>
+          <span>${selectedTenure.months} month${selectedTenure.months > 1 ? 's' : ''}</span>
+        </div>
+        ${savings > 0 ? `
+        <div class="summary-row">
+          <span>Total Savings</span>
+          <span class="discount">-₹${savings.toLocaleString()}</span>
+        </div>
+        ` : ''}
+        <div class="summary-row">
+          <span>Refundable Deposit</span>
+          <span>₹${product.deposit.toLocaleString()}</span>
+        </div>
+        <div class="summary-row">
+          <span>Delivery & Installation</span>
+          <span style="color:var(--success);">FREE</span>
+        </div>
+        <div class="summary-row total">
+          <span>Total Rent (${selectedTenure.months}mo)</span>
+          <span class="value highlight">₹${totalRent.toLocaleString()}</span>
+        </div>
+        <div class="summary-row" style="font-size:0.85rem;color:var(--text-secondary);border:none;padding-top:4px;">
+          <span>Effective monthly cost</span>
+          <span style="font-weight:700;color:var(--primary);">₹${selectedTenure.monthlyRent.toLocaleString()}/mo</span>
+        </div>
+      `;
+
+      // Update global tenure selection for cart
+      window.selectedTenureForCart = selectedTenure;
+    }
+
+    function addProductToCart() {
+      if (!product || !selectedTenure) return;
+
+      const cartItem = {
+        productId: product._id,
+        name: product.name,
+        image: product.image,
+        category: product.category,
+        tenure: selectedTenure.months,
+        monthlyRent: selectedTenure.monthlyRent,
+        deposit: product.deposit,
+        quantity: 1,
+      };
+
+      addToCartDirect(cartItem);
+      showToast(`${product.name} added to cart!`, 'success');
+    }
+  </script>
+</body>
+</html>

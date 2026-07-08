@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — RentEase</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="toast-container" id="toastContainer"></div>
+
+  <div class="dashboard-layout">
+    <aside class="sidebar">
+      <a href="index.html" class="sidebar-brand">
+        <div class="logo-icon"><i class="fas fa-couch"></i></div>
+        RentEase <span style="font-size:0.7rem;background:var(--accent);padding:2px 8px;border-radius:var(--radius-full);margin-left:4px;">ADMIN</span>
+      </a>
+      <ul class="sidebar-nav">
+        <li><a href="admin.html" class="active"><i class="fas fa-chart-line"></i> Overview</a></li>
+        <li><a href="#orders"><i class="fas fa-shopping-bag"></i> All Orders</a></li>
+        <li><a href="#products"><i class="fas fa-boxes"></i> Products</a></li>
+        <li><a href="#maintenance"><i class="fas fa-tools"></i> Maintenance</a></li>
+        <li><a href="catalog.html"><i class="fas fa-eye"></i> View Store</a></li>
+      </ul>
+      <div class="sidebar-footer">
+        <a href="#" onclick="logout(); return false;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+      </div>
+    </aside>
+
+    <main class="dashboard-main">
+      <div class="dashboard-header">
+        <div>
+          <h1>Admin Dashboard <i class="fas fa-shield-alt text-accent" style="font-size:1.4rem;"></i></h1>
+          <p>Manage orders, inventory, and maintenance requests.</p>
+        </div>
+        <div class="header-actions">
+          <a href="index.html" class="btn btn-outline btn-sm"><i class="fas fa-home"></i> View Site</a>
+        </div>
+      </div>
+
+      <!-- KPI Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon primary"><i class="fas fa-shopping-bag"></i></div>
+          <div class="stat-info">
+            <div class="stat-value" id="statOrders">0</div>
+            <div class="stat-label">Total Orders</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon success"><i class="fas fa-truck"></i></div>
+          <div class="stat-info">
+            <div class="stat-value" id="statActive">0</div>
+            <div class="stat-label">Active Rentals</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon warning"><i class="fas fa-rupee-sign"></i></div>
+          <div class="stat-info">
+            <div class="stat-value" id="statMRR">₹0</div>
+            <div class="stat-label">Monthly Revenue</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon info"><i class="fas fa-exclamation-triangle"></i></div>
+          <div class="stat-info">
+            <div class="stat-value" id="statOpenTickets">0</div>
+            <div class="stat-label">Open Tickets</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Orders Management -->
+      <div class="panel" id="orders">
+        <div class="panel-header">
+          <h3><i class="fas fa-shopping-bag text-accent"></i> All Orders</h3>
+          <div>
+            <select id="orderFilter" class="filter-select" onchange="loadAdminData()" style="min-width:180px;">
+              <option value="">All Status</option>
+              <option value="Pending">Pending</option>
+              <option value="Confirmed">Confirmed</option>
+              <option value="Delivered">Delivered</option>
+              <option value="Active">Active</option>
+              <option value="Returned">Returned</option>
+              <option value="Cancelled">Cancelled</option>
+            </select>
+          </div>
+        </div>
+        <div class="panel-body" style="padding:0;overflow-x:auto;">
+          <table class="data-table" id="ordersTable">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Product</th>
+                <th>Tenure</th>
+                <th>Total</th>
+                <th>Payment</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="ordersBody">
+              <tr><td colspan="8" style="text-align:center;padding:24px;color:var(--text-secondary);">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Products Management -->
+      <div class="panel" id="products">
+        <div class="panel-header">
+          <h3><i class="fas fa-boxes text-accent"></i> Product Inventory</h3>
+          <button class="btn btn-primary btn-sm" onclick="openProductModal()">
+            <i class="fas fa-plus"></i> Add Product
+          </button>
+        </div>
+        <div class="panel-body" style="padding:0;overflow-x:auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Category</th>
+                <th>Price Range</th>
+                <th>Deposit</th>
+                <th>Stock</th>
+                <th>Rating</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="productsBody">
+              <tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text-secondary);">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Maintenance Tickets -->
+      <div class="panel" id="maintenance">
+        <div class="panel-header">
+          <h3><i class="fas fa-tools text-accent"></i> Maintenance Requests</h3>
+        </div>
+        <div class="panel-body" id="ticketsBody">
+          <p style="text-align:center;color:var(--text-secondary);padding:20px;">Loading tickets...</p>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ===================== PRODUCT MODAL (Add + Edit) ===================== -->
+  <div id="productModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:#fff;border-radius:16px;max-width:560px;width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid #eee;">
+        <h3 style="margin:0;font-size:1.2rem;" id="modalTitle"><i class="fas fa-plus-circle text-accent"></i> Add New Product</h3>
+        <button onclick="closeProductModal()" style="background:none;border:none;font-size:1.4rem;cursor:pointer;color:#888;">&times;</button>
+      </div>
+
+      <form id="productForm" style="padding:24px;">
+        <input type="hidden" id="editProductId" value="">
+
+        <div style="margin-bottom:14px;">
+          <label style="display:block;font-weight:600;margin-bottom:6px;font-size:0.9rem;">Product Name *</label>
+          <input type="text" id="pName" required placeholder="e.g. Modern Sofa" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:0.95rem;">
+        </div>
+
+        <div style="margin-bottom:14px;">
+          <label style="display:block;font-weight:600;margin-bottom:6px;font-size:0.9rem;">Description *</label>
+          <textarea id="pDesc" required rows="3" placeholder="Product description..." style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:0.95rem;resize:vertical;"></textarea>
+        </div>
+
+        <div style="display:flex;gap:12px;margin-bottom:14px;">
+          <div style="flex:1;">
+            <label style="display:block;font-weight:600;margin-bottom:6px;font-size:0.9rem;">Category *</label>
+            <select id="pCategory" required style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:0.95rem;">
+              <option value="Living Room">Living Room</option>
+              <option value="Bedroom">Bedroom</option>
+              <option value="Kitchen">Kitchen</option>
+              <option value="Office">Office</option>
+              <option value="Electronics">Electronics</option>
+              <option value="Appliances">Appliances</option>
+              <option value="Outdoor">Outdoor</option>
+            </select>
+          </div>
+          <div style="flex:1;">
+            <label style="display:block;font-weight:600;margin-bottom:6px;font-size:0.9rem;">Subcategory</label>
+            <input type="text" id="pSubcategory" placeholder="e.g. Sofa" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:0.95rem;">
+          </div>
+        </div>
+
+        <!-- ============ IMAGE SECTION (URL + Device Upload) ============ -->
+        <div style="background:#f8f9fa;padding:16px;border-radius:10px;margin-bottom:14px;">
+          <label style="display:block;font-weight:700;margin-bottom:10px;font-size:0.9rem;">Product Image * <span style="font-weight:400;color:#888;font-size:0.8rem;">(choose ONE method)</span></label>
+
+          <!-- Method 1: Image URL -->
+          <label style="display:block;font-size:0.85rem;font-weight:600;margin-bottom:4px;"><i class="fas fa-link"></i> Option 1: Image URL</label>
+          <input type="url" id="pImageUrl" placeholder="https://images.unsplash.com/..." oninput="onImageUrlInput()" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:0.95rem;margin-bottom:12px;">
+
+          <div style="text-align:center;color:#aaa;font-size:0.8rem;margin-bottom:10px;">— OR —</div>
+
+          <!-- Method 2: Device Upload -->
+          <label style="display:block;font-size:0.85rem;font-weight:600;margin-bottom:4px;"><i class="fas fa-upload"></i> Option 2: Upload from Device</label>
+          <input type="file" id="pImageFile" accept="image/*" onchange="onImageFileSelect(event)" style="width:100%;padding:8px;border:1px solid #ddd;border-radius:8px;font-size:0.85rem;background:#fff;">
+
+          <!-- Preview + Delete for uploaded image -->
+          <div id="imagePreviewBox" style="display:none;margin-top:12px;text-align:center;">
+            <img id="imagePreview" src="" style="max-width:120px;max-height:120px;border-radius:8px;border:1px solid #ddd;">
+            <button type="button" onclick="clearUploadedImage()" style="display:block;margin:8px auto 0;background:var(--danger,#e11d48);color:#fff;border:none;padding:6px 14px;border-radius:6px;font-size:0.8rem;cursor:pointer;">
+              <i class="fas fa-trash"></i> Remove Uploaded Image
+            </button>
+          </div>
+          <small id="imageHint" style="color:#888;display:block;margin-top:6px;">Tip: Use a URL from unsplash.com OR upload a photo from your device.</small>
+        </div>
+        <!-- ============ END IMAGE SECTION ============ -->
+
+        <div style="display:flex;gap:12px;margin-bottom:14px;">
+          <div style="flex:1;">
+            <label style="display:block;font-weight:600;margin-bottom:6px;font-size:0.9rem;">Brand</label>
+            <input type="text" id="pBrand" placeholder="e.g. ComfortPlus" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:0.95rem;">
+          </div>
+          <div style="flex:1;">
+            <label style="display:block;font-weight:600;margin-bottom:6px;font-size:0.9rem;">Condition</label>
+            <select id="pCondition" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:0.95rem;">
+              <option value="New">New</option>
+              <option value="Like New">Like New</option>
+              <option value="Good">Good</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;margin-bottom:14px;">
+          <div style="flex:1;">
+            <label style="display:block;font-weight:600;margin-bottom:6px;font-size:0.9rem;">Deposit (₹) *</label>
+            <input type="number" id="pDeposit" required min="0" placeholder="2000" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:0.95rem;">
+          </div>
+          <div style="flex:1;">
+            <label style="display:block;font-weight:600;margin-bottom:6px;font-size:0.9rem;">Quantity/Stock *</label>
+            <input type="number" id="pQuantity" required min="0" placeholder="5" style="width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:0.95rem;">
+          </div>
+        </div>
+
+        <div style="background:#f8f9fa;padding:14px;border-radius:10px;margin-bottom:14px;">
+          <label style="display:block;font-weight:700;margin-bottom:10px;font-size:0.9rem;">Monthly Rent for Each Tenure (₹) *</label>
+          <div style="display:flex;gap:12px;">
+            <div style="flex:1;">
+              <label style="display:block;font-size:0.8rem;margin-bottom:4px;">3 Months</label>
+              <input type="number" id="pRent3" required min="0" placeholder="1800" style="width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:8px;">
+            </div>
+            <div style="flex:1;">
+              <label style="display:block;font-size:0.8rem;margin-bottom:4px;">6 Months</label>
+              <input type="number" id="pRent6" required min="0" placeholder="1500" style="width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:8px;">
+            </div>
+            <div style="flex:1;">
+              <label style="display:block;font-size:0.8rem;margin-bottom:4px;">12 Months</label>
+              <input type="number" id="pRent12" required min="0" placeholder="1200" style="width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:8px;">
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;justify-content:flex-end;">
+          <button type="button" onclick="closeProductModal()" class="btn btn-outline">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="saveBtn"><i class="fas fa-save"></i> Save Product</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <!-- ===================== END MODAL ===================== -->
+
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    let allOrders = [];
+    let allProducts = [];
+    let uploadedImageBase64 = '';   // stores device-uploaded image
+    const user = getStoredUser();
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (!user || !user.token) { window.location.href = 'login.html'; return; }
+      if (user.role !== 'admin') { window.location.href = 'dashboard.html'; return; }
+      await loadAdminData();
+      document.getElementById('productForm').addEventListener('submit', handleSaveProduct);
+    });
+
+    async function loadAdminData() {
+      try {
+        const statusFilter = document.getElementById('orderFilter').value;
+        const params = statusFilter ? { status: statusFilter } : {};
+        const ordersRes = await API.getAllOrders(params, user.token);
+        allOrders = ordersRes.orders || [];
+
+        const productsRes = await API.getProducts({});
+        allProducts = productsRes.products || [];
+
+        renderAdminStats();
+        renderOrdersTable();
+        renderProductsTable();
+        renderTickets();
+      } catch (err) {
+        console.error(err);
+        showToast(err.message || 'Error loading admin data', 'error');
+      }
+    }
+
+    function renderAdminStats() {
+      const active = allOrders.filter(o => ['Active', 'Delivered', 'Confirmed'].includes(o.status));
+      const mrr = active.reduce((s, o) => s + (o.tenure?.monthlyRent || 0), 0);
+      const openTickets = allOrders.reduce((s, o) => s + ((o.maintenanceTickets || []).filter(t => t.status !== 'Resolved').length), 0);
+
+      document.getElementById('statOrders').textContent = allOrders.length;
+      document.getElementById('statActive').textContent = active.length;
+      document.getElementById('statMRR').textContent = '₹' + mrr.toLocaleString();
+      document.getElementById('statOpenTickets').textContent = openTickets;
+    }
+
+    function renderOrdersTable() {
+      const body = document.getElementById('ordersBody');
+      if (allOrders.length === 0) {
+        body.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--text-secondary);">No orders found.</td></tr>';
+        return;
+      }
+      body.innerHTML = allOrders.map(o => `
+        <tr>
+          <td style="font-family:monospace;font-size:0.8rem;">#${String(o._id).slice(-6).toUpperCase()}</td>
+          <td>${o.user ? (o.user.name || o.user.email) : '-'}</td>
+          <td>${o.product ? o.product.name : '-'}</td>
+          <td>${o.tenure?.months || '-'}mo</td>
+          <td>₹${(o.totalRent || 0).toLocaleString()}</td>
+          <td style="font-size:0.8rem;">${o.paymentMethod || 'COD'}</td>
+          <td><span class="status-badge ${(o.status || '').toLowerCase()}">${o.status || 'Pending'}</span></td>
+          <td>
+            <select onchange="updateStatus('${o._id}', this.value)" style="padding:6px 10px;font-size:0.8rem;min-width:auto;">
+              <option value="">Change</option>
+              <option value="Confirmed">Confirm</option>
+              <option value="Delivered">Mark Delivered</option>
+              <option value="Active">Mark Active</option>
+              <option value="Returned">Mark Returned</option>
+              <option value="Cancelled">Cancel</option>
+            </select>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function updateStatus(orderId, newStatus) {
+      if (!newStatus) return;
+      try {
+        await API.updateOrderStatus(orderId, newStatus, user.token);
+        showToast(`Order status updated to ${newStatus}`, 'success');
+        await loadAdminData();
+      } catch (err) {
+        showToast(err.message || 'Update failed', 'error');
+      }
+    }
+
+    function renderProductsTable() {
+      const body = document.getElementById('productsBody');
+      if (allProducts.length === 0) {
+        body.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;">No products found.</td></tr>';
+        return;
+      }
+      body.innerHTML = allProducts.slice(0, 50).map(p => {
+        const prices = p.tenureOptions.map(t => t.monthlyRent);
+        const min = Math.min(...prices);
+        const max = Math.max(...prices);
+        return `
+          <tr>
+            <td>
+              <img src="${p.image}" class="product-thumb" onerror="this.style.display='none'">
+              <strong>${p.name}</strong>
+            </td>
+            <td>${p.category}</td>
+            <td>₹${min.toLocaleString()} – ₹${max.toLocaleString()}/mo</td>
+            <td>₹${(p.deposit || 0).toLocaleString()}</td>
+            <td><span style="color:${p.quantity > 0 ? 'var(--success)' : 'var(--danger)'};font-weight:600;">${p.quantity || 0}</span></td>
+            <td>${getStarRating(p.rating)} (${p.numReviews})</td>
+            <td style="white-space:nowrap;">
+              <button onclick="openEditProduct('${p._id}')" class="btn btn-sm" style="background:#3b82f6;color:#fff;padding:5px 10px;font-size:0.75rem;border:none;border-radius:6px;cursor:pointer;margin-right:4px;" title="Edit">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button onclick="deleteProduct('${p._id}', '${(p.name || '').replace(/'/g, "")}')" class="btn btn-sm" style="background:var(--danger,#e11d48);color:#fff;padding:5px 10px;font-size:0.75rem;border:none;border-radius:6px;cursor:pointer;" title="Delete">
+                <i class="fas fa-trash"></i>
+              </button>
+            </td>
+          </tr>`;
+      }).join('');
+    }
+
+    // ===================== IMAGE HANDLING (URL + Device with lock) =====================
+    function onImageUrlInput() {
+      const url = document.getElementById('pImageUrl').value.trim();
+      const fileInput = document.getElementById('pImageFile');
+      if (url) {
+        // URL filled → lock device upload
+        fileInput.disabled = true;
+        fileInput.style.opacity = '0.5';
+        fileInput.style.cursor = 'not-allowed';
+        document.getElementById('imageHint').textContent = 'Using Image URL. Device upload is locked. Clear URL to switch.';
+      } else if (!uploadedImageBase64) {
+        // URL empty and no upload → unlock device
+        fileInput.disabled = false;
+        fileInput.style.opacity = '1';
+        fileInput.style.cursor = 'pointer';
+        document.getElementById('imageHint').textContent = 'Tip: Use a URL from unsplash.com OR upload a photo from your device.';
+      }
+    }
+
+    function onImageFileSelect(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      // If URL already filled → block and show error
+      const url = document.getElementById('pImageUrl').value.trim();
+      if (url) {
+        showToast('Please clear the Image URL first to upload from device.', 'error');
+        event.target.value = '';
+        return;
+      }
+
+      // Size check (max 2MB to keep DB light)
+      if (file.size > 2 * 1024 * 1024) {
+        showToast('Image too large. Please use an image under 2MB.', 'error');
+        event.target.value = '';
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        uploadedImageBase64 = e.target.result;
+        document.getElementById('imagePreview').src = uploadedImageBase64;
+        document.getElementById('imagePreviewBox').style.display = 'block';
+        // Lock URL field
+        const urlInput = document.getElementById('pImageUrl');
+        urlInput.disabled = true;
+        urlInput.style.opacity = '0.5';
+        urlInput.style.cursor = 'not-allowed';
+        document.getElementById('imageHint').textContent = 'Using uploaded image. URL is locked. Remove image to switch.';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function clearUploadedImage() {
+      uploadedImageBase64 = '';
+      document.getElementById('pImageFile').value = '';
+      document.getElementById('imagePreviewBox').style.display = 'none';
+      document.getElementById('imagePreview').src = '';
+      // Unlock URL field
+      const urlInput = document.getElementById('pImageUrl');
+      urlInput.disabled = false;
+      urlInput.style.opacity = '1';
+      urlInput.style.cursor = 'text';
+      document.getElementById('imageHint').textContent = 'Tip: Use a URL from unsplash.com OR upload a photo from your device.';
+      showToast('Uploaded image removed. You can now enter a URL.', 'info');
+    }
+    // ===================== END IMAGE HANDLING =====================
+
+    // ===================== PRODUCT MODAL (Add + Edit) =====================
+    function openProductModal() {
+      // Reset for Add mode
+      document.getElementById('editProductId').value = '';
+      document.getElementById('modalTitle').innerHTML = '<i class="fas fa-plus-circle text-accent"></i> Add New Product';
+      document.getElementById('saveBtn').innerHTML = '<i class="fas fa-save"></i> Save Product';
+      document.getElementById('productForm').reset();
+      resetImageInputs();
+      document.getElementById('productModal').style.display = 'flex';
+    }
+
+    function openEditProduct(id) {
+      const p = allProducts.find(pr => pr._id === id);
+      if (!p) return;
+
+      document.getElementById('editProductId').value = id;
+      document.getElementById('modalTitle').innerHTML = '<i class="fas fa-edit text-accent"></i> Edit Product';
+      document.getElementById('saveBtn').innerHTML = '<i class="fas fa-save"></i> Update Product';
+
+      // Fill form
+      document.getElementById('pName').value = p.name;
+      document.getElementById('pDesc').value = p.description;
+      document.getElementById('pCategory').value = p.category;
+      document.getElementById('pSubcategory').value = p.subcategory || '';
+      document.getElementById('pBrand').value = p.brand || '';
+      document.getElementById('pCondition').value = p.condition || 'New';
+      document.getElementById('pDeposit').value = p.deposit;
+      document.getElementById('pQuantity').value = p.quantity;
+
+      const t3 = p.tenureOptions.find(t => t.months === 3);
+      const t6 = p.tenureOptions.find(t => t.months === 6);
+      const t12 = p.tenureOptions.find(t => t.months === 12);
+      document.getElementById('pRent3').value = t3 ? t3.monthlyRent : '';
+      document.getElementById('pRent6').value = t6 ? t6.monthlyRent : '';
+      document.getElementById('pRent12').value = t12 ? t12.monthlyRent : '';
+
+      // Handle image
+      resetImageInputs();
+      if (p.image && p.image.startsWith('data:image')) {
+        // It's an uploaded (base64) image
+        uploadedImageBase64 = p.image;
+        document.getElementById('imagePreview').src = p.image;
+        document.getElementById('imagePreviewBox').style.display = 'block';
+        const urlInput = document.getElementById('pImageUrl');
+        urlInput.disabled = true; urlInput.style.opacity = '0.5';
+      } else if (p.image) {
+        // It's a URL
+        document.getElementById('pImageUrl').value = p.image;
+        onImageUrlInput();
+      }
+
+      document.getElementById('productModal').style.display = 'flex';
+    }
+
+    function resetImageInputs() {
+      uploadedImageBase64 = '';
+      document.getElementById('pImageUrl').value = '';
+      document.getElementById('pImageUrl').disabled = false;
+      document.getElementById('pImageUrl').style.opacity = '1';
+      document.getElementById('pImageFile').value = '';
+      document.getElementById('pImageFile').disabled = false;
+      document.getElementById('pImageFile').style.opacity = '1';
+      document.getElementById('imagePreviewBox').style.display = 'none';
+      document.getElementById('imageHint').textContent = 'Tip: Use a URL from unsplash.com OR upload a photo from your device.';
+    }
+
+    function closeProductModal() {
+      document.getElementById('productModal').style.display = 'none';
+      document.getElementById('productForm').reset();
+      resetImageInputs();
+    }
+
+    async function handleSaveProduct(e) {
+      e.preventDefault();
+
+      // Determine image source
+      const urlValue = document.getElementById('pImageUrl').value.trim();
+      let finalImage = '';
+      if (uploadedImageBase64) {
+        finalImage = uploadedImageBase64;
+      } else if (urlValue) {
+        finalImage = urlValue;
+      } else {
+        showToast('Please provide an image (URL or upload).', 'error');
+        return;
+      }
+
+      const productData = {
+        name: document.getElementById('pName').value.trim(),
+        description: document.getElementById('pDesc').value.trim(),
+        category: document.getElementById('pCategory').value,
+        subcategory: document.getElementById('pSubcategory').value.trim() || 'General',
+        image: finalImage,
+        brand: document.getElementById('pBrand').value.trim() || 'RentEase',
+        condition: document.getElementById('pCondition').value,
+        deposit: Number(document.getElementById('pDeposit').value),
+        quantity: Number(document.getElementById('pQuantity').value),
+        availability: Number(document.getElementById('pQuantity').value) > 0,
+        tenureOptions: [
+          { months: 3, monthlyRent: Number(document.getElementById('pRent3').value), discount: 0 },
+          { months: 6, monthlyRent: Number(document.getElementById('pRent6').value), discount: 15 },
+          { months: 12, monthlyRent: Number(document.getElementById('pRent12').value), discount: 30 },
+        ],
+      };
+
+      const editId = document.getElementById('editProductId').value;
+
+      try {
+        if (editId) {
+          // Update existing
+          await API.updateProduct(editId, productData, user.token);
+          showToast('Product updated successfully!', 'success');
+        } else {
+          // Create new
+          productData.rating = 4.5;
+          productData.numReviews = 0;
+          productData.features = [];
+          await API.createProduct(productData, user.token);
+          showToast('Product added successfully!', 'success');
+        }
+        closeProductModal();
+        await loadAdminData();
+      } catch (err) {
+        console.error(err);
+        showToast(err.message || 'Failed to save product', 'error');
+      }
+    }
+
+    async function deleteProduct(id, name) {
+      if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
+      try {
+        await API.deleteProduct(id, user.token);
+        showToast('Product deleted', 'success');
+        await loadAdminData();
+      } catch (err) {
+        showToast(err.message || 'Delete failed', 'error');
+      }
+    }
+    // ===================== END PRODUCT MODAL =====================
+
+    function renderTickets() {
+      const body = document.getElementById('ticketsBody');
+      const allTickets = [];
+      allOrders.forEach(o => {
+        (o.maintenanceTickets || []).forEach(t => {
+          allTickets.push({ ...t, orderId: o._id, productName: o.product ? o.product.name : 'Product', userName: o.user ? o.user.name : 'Customer' });
+        });
+      });
+
+      if (allTickets.length === 0) {
+        body.innerHTML = '<p style="text-align:center;color:var(--text-secondary);padding:20px;">No maintenance tickets.</p>';
+        return;
+      }
+
+      body.innerHTML = `
+        <div style="overflow-x:auto;">
+        <table class="data-table">
+          <thead>
+            <tr><th>Ticket</th><th>Customer</th><th>Product</th><th>Issue</th><th>Description</th><th>Status</th><th>Raised</th></tr>
+          </thead>
+          <tbody>
+            ${allTickets.map(t => `
+              <tr>
+                <td style="font-family:monospace;font-size:0.8rem;">#${String(t._id || Math.random()).slice(-6).toUpperCase()}</td>
+                <td>${t.userName}</td>
+                <td>${t.productName}</td>
+                <td><strong>${t.issue}</strong></td>
+                <td style="max-width:250px;">${t.description}</td>
+                <td><span class="status-badge ${(t.status || 'open').toLowerCase()}">${t.status || 'Open'}</span></td>
+                <td>${t.raisedAt ? formatDate(t.raisedAt) : '-'}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table></div>`;
+    }
+
+    function logout() {
+      clearStoredUser();
+      window.location.href = 'login.html';
+    }
+
+    document.getElementById('productModal').addEventListener('click', function(e) {
+      if (e.target === this) closeProductModal();
+    });
+  </script>
+</body>
+</html>

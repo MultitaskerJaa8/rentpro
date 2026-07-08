@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up — RentEase</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="auth-page">
+  <div class="toast-container" id="toastContainer"></div>
+
+  <div class="auth-card">
+    <a href="index.html" class="auth-logo">
+      <div class="logo-icon"><i class="fas fa-couch"></i></div>
+      RentEase
+    </a>
+    <p class="auth-subtitle">Create your account to start renting premium furniture & appliances.</p>
+
+    <form onsubmit="handlePageRegister(event)">
+      <div class="form-group">
+        <label for="name"><i class="fas fa-user"></i> Full Name</label>
+        <input type="text" id="name" placeholder="John Doe" required>
+      </div>
+      <div class="form-group">
+        <label for="email"><i class="fas fa-envelope"></i> Email Address</label>
+        <input type="email" id="email" placeholder="your@email.com" required>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="phone"><i class="fas fa-phone"></i> Phone</label>
+          <input type="tel" id="phone" placeholder="+91 9876543210">
+        </div>
+        <div class="form-group">
+          <label for="password"><i class="fas fa-lock"></i> Password</label>
+          <input type="password" id="password" placeholder="Min 6 characters" required minlength="6">
+        </div>
+      </div>
+      <div style="margin-bottom:20px;font-size:0.8rem;color:var(--text-secondary);">
+        <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;">
+          <input type="checkbox" required style="width:auto;margin-top:3px;">
+          <span>I agree to the <a href="#" style="color:var(--accent);">Terms of Service</a> and <a href="#" style="color:var(--accent);">Privacy Policy</a>.</span>
+        </label>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block btn-lg" id="registerBtn">
+        <i class="fas fa-user-plus"></i> Create Account
+      </button>
+    </form>
+
+    <p class="auth-switch">
+      Already have an account? <a href="login.html">Sign in</a>
+    </p>
+    <p class="auth-switch" style="margin-top:8px;">
+      <a href="index.html"><i class="fas fa-arrow-left"></i> Back to Home</a>
+    </p>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const user = getStoredUser();
+      if (user && user.token) {
+        window.location.href = user.role === 'admin' ? 'admin.html' : 'dashboard.html';
+      }
+    });
+
+    async function handlePageRegister(e) {
+      e.preventDefault();
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const phone = document.getElementById('phone').value;
+      const password = document.getElementById('password').value;
+      const btn = document.getElementById('registerBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<span class="loader loader-dark"></span> Creating account...';
+
+      try {
+        const data = await API.register({ name, email, phone, password });
+        setStoredUser(data);
+        showToast(`Welcome to RentEase, ${data.name}!`, 'success');
+        setTimeout(() => window.location.href = 'dashboard.html', 800);
+      } catch (err) {
+        showToast(err.message || 'Registration failed', 'error');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-user-plus"></i> Create Account';
+      }
+    }
+  </script>
+</body>
+</html>
